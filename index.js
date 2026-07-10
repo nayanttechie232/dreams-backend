@@ -26,4 +26,10 @@ app.get('/api/dreams/:id', async (req, res) => { const dream = await Dream.findB
 app.post('/api/dreams', auth, async (req, res) => res.json(await Dream.create({ ...req.body, author: req.user.id })));
 app.put('/api/dreams/:id', auth, async (req, res) => { const dream = await Dream.findById(req.params.id); if (!dream || dream.author.toString() !== req.user.id) return res.sendStatus(403); Object.assign(dream, req.body); await dream.save(); await dream.populate('author', 'username'); res.json(dream); });
 app.post('/api/upload', auth, upload.single('image'), async (req, res) => { if (!process.env.CLOUDINARY_CLOUD_NAME) return res.status(501).json({ message: 'Cloudinary is not configured.' }); const result = await new Promise((resolve, reject) => cloudinary.uploader.upload_stream({ folder: 'papermoon' }, (e, r) => e ? reject(e) : resolve(r)).end(req.file.buffer)); res.json({ url: result.secure_url }); });
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "PaperMoon API is running 🚀",
+  });
+});
 app.listen(process.env.PORT || 5000, () => console.log('PaperMoon server ready'));
